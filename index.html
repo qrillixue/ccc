@@ -1,0 +1,761 @@
+<!DOCTYPE html>
+<!-- CSS map:
+    :root                 → colors, fonts, layout tokens (edit here first)
+    base / reset          → global tags: body, headings, .wrap, .eyebrow
+    nav                   → sticky top navigation bar
+    hero                  → homepage banner + dossier background texture
+    section heads         → the eyebrow
+    explainer              → "What is an Interest Scheme"
+    industries  →         clickable tiles
+    process                → journey
+    footer                  → bottom of page, links + address
+
+  HTML map (inside <body>, in order):
+    <header>               → logo image + nav links + "Begin your journey" button
+    <main>
+      #top .hero            → banner, headline, stats
+      #what                 → interest scheme explainer
+      #services              → 9 service tiles
+      #process               → 4-step process
+    <footer>                → footer columns + copyright line
+    <script>                → tile
+
+    -->
+
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Interest Scheme Advisory</title>
+<link rel="icon" type="image/x-icon" href="images/favicon.ico">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&family=Roboto+Mono:wght@400;500;600&family=IBM+Plex+Serif:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  @font-face {
+    font-family: 'Google Sans Variable';
+    font-style: normal;
+    font-display: swap;
+    font-weight: 400 700;
+    src: url(https://cdn.jsdelivr.net/fontsource/fonts/google-sans:vf@latest/latin-wght-normal.woff2) format('woff2-variations');
+  }
+  :root{
+    /* Colors */
+    --navy-950:#001839;   /* page bg, darkest */
+    --navy-900:#191919;   /* panel bg (tiles, cards, footer) */
+    --navy-800:#252525;   /* tile hover bg */
+    --navy-700:#4A4A4A;   /* reserve shade */
+    --gold:#F28D2C;       /* primary brand accent */
+    --gold-dim:#D36E0D;   /* darker gold, used in gradients */
+    --spark:#E73454;      /* CTA / button accent */
+    --spark-dim:#AC2E28;  /* darker spark */
+    --paper:#FAFFFF;      /* light bg */
+    --paper-dim:#E5E5E5;  /* muted light text */
+    --slate:#BCBCBC;      /* secondary text on dark bg */
+    --ink:#151515;        /* main dark text color on light bg */
+
+    /* fonts */
+    --font-display:'Google Sans Variable', 'Google Sans', -apple-system, sans-serif; /* headers */
+    --font-body:'Manrope', sans-serif;      /* body */
+    --font-mono:'Roboto Mono', monospace;        /* numbers */
+    --font-small:'IBM Plex Serif', serif;        /* tiny labels*/
+
+    --container: 1180px;  /* max width of for wrapping */
+  }
+
+  /* base */
+  /* global defaults */
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    margin:0;
+    background:var(--navy-950);
+    color:var(--paper);
+    font-family:var(--font-body);
+    line-height:1.5;
+    -webkit-font-smoothing:antialiased;
+  }
+  @media (prefers-reduced-motion: reduce){
+    html{scroll-behavior:auto;}
+    *{animation-duration:0.001ms !important; animation-iteration-count:1 !important; transition-duration:0.001ms !important;}
+  }
+
+  img,svg{display:block; max-width:100%;}
+  a{color:inherit;}
+  .wrap{max-width:var(--container); margin:0 auto; padding:0 32px;}
+  section{padding:120px 0;}
+  @media (max-width:768px){ section{padding:72px 0;} .wrap{padding:0 20px;} }
+
+  h1,h2,h3{font-family:var(--font-display); font-weight:600; margin:0; letter-spacing:-0.01em;}
+
+  /* .eyebrow */
+  .eyebrow{
+    font-family:var(--font-small);
+    font-size:12px;
+    letter-spacing:0.16em;
+    text-transform:uppercase;
+    color:var(--gold);
+    display:flex;
+    align-items:center;
+    gap:10px;
+    margin-bottom:18px;
+  }
+  .eyebrow::before{
+    content:'';
+    width:24px; height:1px;
+    background:var(--gold);
+    display:inline-block;
+  }
+
+  :focus-visible{ outline:2px solid var(--spark); outline-offset:3px; }
+
+  /* navbar */
+  header{
+    position:sticky; top:0; z-index:100;
+    background:rgba(8,15,31,0.82);
+    backdrop-filter:blur(10px);
+    border-bottom:1px solid rgba(201,162,75,0.18);
+  }
+  nav.wrap{
+    display:flex; align-items:center; justify-content:space-between;
+    height:76px;
+  }
+  .logo{
+    display:flex; align-items:center;
+    text-decoration:none;
+  }
+  .logo img{
+    height:44px;
+    width:auto;
+    display:block;
+  }
+  .navlinks{
+    display:flex; gap:36px; list-style:none; margin:0; padding:0;
+    font-size:14px; font-weight:500;
+  }
+  .navlinks a{
+    text-decoration:none; color:var(--slate);
+    transition:color .2s ease;
+    position:relative;
+  }
+  .navlinks a:hover{ color:var(--paper); }
+  .navcta{
+    display:inline-flex; align-items:center; gap:8px;
+    background:var(--spark);
+    color:var(--navy-950);
+    font-weight:600; font-size:14px;
+    padding:10px 20px;
+    border-radius:3px;
+    text-decoration:none;
+    transition:background .2s ease, transform .2s ease;
+  }
+  .navcta:hover{ background:#ff7f56; transform:translateY(-1px); }
+  .navmobile{display:none;}
+  @media (max-width:860px){
+    .navlinks{display:none;}
+  }
+
+  /* hero.  below 940px the photo drops out*/
+  .hero{
+    padding-top:110px;
+    padding-bottom:80px;
+    position:relative;
+    overflow:hidden;
+
+    /* grid across the page*/
+    background-image:
+      linear-gradient(rgba(201,162,75,0.055) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(201,162,75,0.055) 1px, transparent 1px);
+    background-size:64px 64px;
+    background-position:center top;
+  }
+  @media (min-width:940px){
+    .hero{ min-height:720px; display:flex; align-items:center; }
+  }
+  .hero-shell{
+    position:relative;
+    z-index:3;
+    width:100%;
+  }
+  .hero-copy{
+    max-width:560px;
+  }
+
+  /* the building photo — hidden on narrow screens, bled full-height/full-right above 940px */
+  .hero-media{ display:none; }
+  @media (min-width:940px){
+    .hero-media{
+      display:block;
+      position:absolute;
+      top:0; right:0; bottom:0;
+      width:44%;
+      z-index:1;
+      overflow:hidden;
+    }
+    .hero-media img{
+      width:100%; height:100%;
+      object-fit:cover;
+      object-position:center 30%;
+      display:block;
+      filter:saturate(0.85) brightness(0.8);
+    }
+
+    /* image bleed*/
+    .hero-media::after{
+      content:'';
+      position:absolute; inset:0;
+      background:
+        linear-gradient(0deg, rgba(8,15,31,0.75) 0%, rgba(8,15,31,0) 32%),
+        linear-gradient(100deg, var(--navy-950) 0%, rgba(8,15,31,0.55) 14%, rgba(8,15,31,0) 40%);
+      pointer-events:none;
+    }
+  }
+
+  /* photo caption tags */
+  .hero-tag{
+    position:absolute;
+    font-family:var(--font-mono);
+    font-size:11px;
+    letter-spacing:0.1em;
+    color:rgba(243,239,231,0.7);
+    white-space:nowrap;
+  }
+  .hero-tag b{
+    color:rgba(201,162,75,0.85);
+    font-weight:500;
+  }
+  .hero-tag-coord{ display:none; }
+  @media (min-width:1150px){
+    .hero-tag-coord{
+      display:block;
+      left:32px; bottom:28px;
+      text-align:left;
+      z-index:2;
+    }
+    .hero-tag-coord span{ display:block; }
+    .hero-tag-coord span:first-child{ margin-bottom:6px; }
+  }
+
+  /* vertical text on image*/
+  .hero-spine{ display:none; }
+  @media (min-width:1150px){
+    .hero-spine{
+      display:block;
+      position:absolute;
+      top:50%; right:22px;
+      transform:translateY(-50%) rotate(90deg);
+      transform-origin:center;
+      font-family:var(--font-mono);
+      font-size:11px;
+      letter-spacing:0.22em;
+      color:rgba(243,239,231,0.55);
+      white-space:nowrap;
+      z-index:2;
+    }
+  }
+
+  .hero h1{
+    font-size:clamp(38px, 5.2vw, 62px);
+    line-height:1.06;
+    color:var(--paper);
+  }
+  .hero h1 em{
+    font-style:italic;
+    color:var(--gold);
+    position:relative;
+    display:inline-block;
+  }
+  .hero h1 em::before{
+    /* soft gold glow */
+    content:'';
+    position:absolute;
+    top:50%; left:50%;
+    transform:translate(-50%,-50%);
+    width:420px; height:420px;
+    background:radial-gradient(circle, rgba(201,162,75,0.18), transparent 70%);
+    z-index:-1;
+    pointer-events:none;
+  }
+  .hero p.lede{
+    margin-top:24px;
+    font-size:18px;
+    color:var(--slate);
+    max-width:46ch;
+    line-height:1.65;
+  }
+  .hero-ctas{
+    display:flex; gap:16px; margin-top:38px; flex-wrap:wrap;
+  }
+  .btn-primary{
+    background:var(--spark);
+    color:var(--navy-950);
+    font-weight:600; font-size:15px;
+    padding:15px 26px;
+    border-radius:3px;
+    text-decoration:none;
+    border:none;
+    cursor:pointer;
+    transition:background .2s ease, transform .2s ease;
+  }
+  .btn-primary:hover{ background:#ff7f56; transform:translateY(-2px); }
+  .btn-secondary{
+    display:inline-flex; align-items:center; gap:8px;
+    background:transparent;
+    color:var(--paper);
+    font-weight:600; font-size:15px;
+    padding:15px 22px;
+    border-radius:3px;
+    border:1px solid rgba(243,239,231,0.25);
+    text-decoration:none;
+    transition:border-color .2s ease, color .2s ease;
+  }
+  .btn-secondary:hover{ border-color:var(--gold); color:var(--gold); }
+
+  .hero-stats{
+    display:flex; gap:36px; margin-top:56px;
+  }
+  .hero-stats div strong{
+    display:block;
+    font-size:26px;
+    color:var(--paper);
+    font-weight:500;
+    font-family:var(--font-mono);
+  }
+  .hero-stats div span{
+    font-size:12px; color:var(--slate); text-transform:uppercase; letter-spacing:0.08em;
+    font-family:var(--font-small);
+  }
+
+  /* section heads */
+  .section-head{
+    max-width:640px;
+    margin-bottom:56px;
+  }
+  .section-head h2{
+    font-size:clamp(28px, 3.4vw, 40px);
+    color:var(--paper);
+    line-height:1.15;
+  }
+  .section-head p{
+    margin-top:16px;
+    color:var(--slate);
+    font-size:16px;
+    line-height:1.65;
+  }
+  .light .section-head h2{ color:var(--ink); }
+  .light .section-head p{ color:#5b6472; }
+  .light .eyebrow{ color:var(--spark-dim); }
+  .light .eyebrow::before{ background:var(--spark-dim); }
+
+  /* interest scheme explainer */
+  .light{
+    background:var(--paper);
+    color:var(--ink);
+  }
+  .explain-copy{ max-width:720px; }
+  .explain-copy p{
+    font-size:16px;
+    color:#3c4451;
+    line-height:1.75;
+    margin:0 0 18px;
+  }
+  .explain-copy p strong{ color:var(--ink); }
+
+  /* services */
+  .services{ background:var(--navy-950); }
+  .tile-grid{
+    display:grid;
+    grid-template-columns:repeat(3, 1fr);
+    gap:1px;
+    background:rgba(201,162,75,0.18);
+    border:1px solid rgba(201,162,75,0.18);
+    border-radius:6px;
+    overflow:hidden;
+  }
+  @media (max-width:860px){ .tile-grid{grid-template-columns:repeat(2,1fr);} }
+  @media (max-width:560px){ .tile-grid{grid-template-columns:1fr;} }
+
+  .tile{
+    background:var(--navy-900);
+    padding:28px 24px;
+    min-height:190px;
+    display:flex;
+    flex-direction:column;
+    justify-content:space-between;
+    cursor:pointer;
+    position:relative;
+    transition:background .25s ease;
+    text-align:left;
+    border:none;
+    color:inherit;
+    font-family:inherit;
+  }
+  .tile:hover, .tile:focus-visible, .tile.active{
+    background:var(--navy-800);
+  }
+  .tile-symbol{
+    font-family:var(--font-mono);
+    font-size:12px;
+    color:var(--gold);
+    letter-spacing:0.08em;
+  }
+  .tile-title{
+    font-family:var(--font-display);
+    font-size:20px;
+    font-weight:600;
+    color:var(--paper);
+    margin-top:28px;
+  }
+  .tile-desc{
+    font-size:14px;
+    color:var(--slate);
+    line-height:1.6;
+    max-height:0;
+    opacity:0;
+    overflow:hidden;
+    transition:max-height .35s ease, opacity .3s ease, margin-top .35s ease;
+    margin-top:0;
+  }
+  .tile.active .tile-desc{
+    max-height:200px;
+    opacity:1;
+    margin-top:14px;
+  }
+  .tile-toggle{
+    align-self:flex-end;
+    width:26px; height:26px;
+    border-radius:50%;
+    border:1px solid rgba(243,239,231,0.25);
+    display:flex; align-items:center; justify-content:center;
+    font-size:15px;
+    color:var(--slate);
+    transition:transform .3s ease, border-color .2s ease, color .2s ease;
+    flex-shrink:0;
+  }
+  .tile.active .tile-toggle{ transform:rotate(45deg); border-color:var(--spark); color:var(--spark); }
+  .tile-top{ display:flex; justify-content:space-between; align-items:flex-start; }
+
+  /* processes */
+  .process-list{
+    display:flex;
+    flex-direction:column;
+  }
+  .process-item{
+    display:grid;
+    grid-template-columns:80px 1fr;
+    gap:28px;
+    padding:32px 0;
+    border-top:1px solid rgba(10,24,48,0.12);
+  }
+  .process-item:last-child{ border-bottom:1px solid rgba(10,24,48,0.12); }
+  .process-num{
+    font-family:var(--font-mono);
+    font-size:14px;
+    color:var(--spark-dim);
+    padding-top:4px;
+  }
+  .process-item h3{
+    font-size:21px;
+    color:var(--ink);
+    margin-bottom:8px;
+  }
+  .process-item p{
+    color:#5b6472;
+    font-size:15px;
+    line-height:1.65;
+    max-width:60ch;
+    margin:0;
+  }
+
+  /* footer */
+  footer{
+    background:var(--navy-950);
+    padding:64px 0 40px;
+  }
+  .footer-grid{
+    display:grid;
+    grid-template-columns:1.4fr 1fr 1fr 1fr;
+    gap:40px;
+    padding-bottom:48px;
+    border-bottom:1px solid rgba(243,239,231,0.1);
+  }
+  @media (max-width:768px){ .footer-grid{grid-template-columns:1fr 1fr;} }
+  .footer-grid h4{
+    font-family:var(--font-small);
+    font-size:12px;
+    text-transform:uppercase;
+    letter-spacing:0.1em;
+    color:var(--gold);
+    margin:0 0 16px;
+  }
+  .footer-grid ul{ list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:10px; }
+  .footer-grid a{ font-family:var(--font-small); text-decoration:none; color:var(--slate); font-size:14px; transition:color .2s ease; }
+  .footer-grid a:hover{ color:var(--paper); }
+  .footer-bottom{
+    display:flex; justify-content:space-between; align-items:center;
+    padding-top:28px;
+    font-size:13px;
+    font-family:var(--font-small);
+    color:var(--slate);
+    flex-wrap:wrap;
+    gap:12px;
+  }
+</style>
+</head>
+<body>
+
+<!-- sticky top nav-->
+<header>
+  <nav class="wrap">
+    <a href="#top" class="logo"><img src="images/logo.png" alt="CATALYST"></a>
+  </nav>
+</header>
+
+<main id="top">
+
+  <!-- hero hehehe -->
+  <section class="hero">
+    <div class="hero-media">
+      <img src="images/hero.png" alt="SSM Headquarters">
+      <div class="hero-tag hero-tag-coord" aria-hidden="true">
+      </div>
+      <div class="hero-spine" aria-hidden="true">CATALYZING BUSINESSES SINCE 2009</div>
+    </div>
+    <div class="wrap hero-shell">
+      <div class="hero-copy">
+        <div class="eyebrow">Interest Scheme Advisory based in Ipoh, Malaysia</div>
+        <h1>Interest Scheme is the <em>fastest path</em> to public funding in Malaysia.</h1>
+        <p class="lede">An Interest Scheme is a legal structure allowing companies to raise money from the public without needing to issue shares or bonds. It works by issuing the public a participation right such as a right-to-use or share of profits from a business that isn't directly controlled by the investors.</p>
+        <p class="lede" style="margin-top:14px;">CATALYST helps companies comply with Interest Scheme laws. We bring clarity and speed to businesses navigating the regulatory trenches, and deliver the actionable insight that catalyzes an idea into approval.</p>
+        <div class="hero-ctas">
+          <a href="resources.html" class="btn-secondary">Explore resources →</a>
+        </div>
+        <div class="hero-stats">
+          <div><strong>RM 2.82b+</strong><span>Cumulative funds approved</span></div>
+          <div><strong>12</strong><span>Active clients</span></div>
+          <div><strong>20+</strong><span>Years of experience</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- interest scheme explainer -->
+  <section class="light" id="what">
+    <div class="wrap">
+      <div class="section-head">
+        <div class="eyebrow">A Brief Introduction to Interest Scheme</div>
+        <h2>An alternative route to public capital, without issuing shares or bonds</h2>
+        <p>An Interest Scheme is regulated under Interest Schemes Act (2016) by the Companies Commission of Malaysia, that lets a company raise money from the public by issuing a <em>participation right</em> rather than equity or debt.</p>
+      </div>
+      <div class="explain-copy">
+        <p>The public buys a right, not a share. Interests can take the form of a <em>right-to-use</em>, or a <em>share of profits</em>, in a business that the investors don't directly control.</p>
+        <p>Every scheme application is rigorously reviewed by the Companies Commission of Malaysia, and is perpetually monitored for as long as it is in operation to protect the interests of investors.</p>
+        <p>In the past, the brains behind CATALYST have processed applications from inside the statutory body. Now, we build the cases from outside. This means that our clients can traverse the vast ravines of compliance without unnecessary delays caused by trial and error.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- industries -->
+  <section class="services" id="services">
+    <div class="wrap">
+      <div class="section-head">
+        <div class="eyebrow">OUR EXPERIENCE</div>
+        <h2>Industries that we've helped businesses in</h2>
+        <p>The capabiity of CATALYST extend far and wide, across any industry or sector.</p>
+      </div>
+
+      <!-- interactable tiles-->
+      <div class="tile-grid" id="tileGrid">
+        <button class="tile" data-tile>
+          <div class="tile-top">
+            <span class="tile-symbol">Mp</span>
+            <span class="tile-toggle">+</span>
+          </div>
+          <div>
+            <div class="tile-title">Memorial Parks</div>
+            <div class="tile-desc">Interests are structured around the interest holders' right to use the memorial park's units and facilities.</div>
+          </div>
+        </button>
+
+        <button class="tile" data-tile>
+          <div class="tile-top">
+            <span class="tile-symbol">Ag</span>
+            <span class="tile-toggle">+</span>
+          </div>
+          <div>
+            <div class="tile-title">Plantation/Forestry</div>
+            <div class="tile-desc">Raise capital by offering a share of the profits in the underlying venture.</div>
+          </div>
+        </button>
+
+        <button class="tile" data-tile>
+          <div class="tile-top">
+            <span class="tile-symbol">Mn</span>
+            <span class="tile-toggle">+</span>
+          </div>
+          <div>
+            <div class="tile-title">Mining/Exploration</div>
+            <div class="tile-desc">Colossal operational costs are funded by interest holders, who are then rewarded by investment returns.</div>
+          </div>
+        </button>
+
+        <button class="tile" data-tile>
+          <div class="tile-top">
+            <span class="tile-symbol">Gc</span>
+            <span class="tile-toggle">+</span>
+          </div>
+          <div>
+            <div class="tile-title">Golf/Country Clubs</div>
+            <div class="tile-desc">Operators guarantee a right to use the facilities, rather than offering equity in the club itself.</div>
+          </div>
+        </button>
+
+        <button class="tile" data-tile>
+          <div class="tile-top">
+            <span class="tile-symbol">Re</span>
+            <span class="tile-toggle">+</span>
+          </div>
+          <div>
+            <div class="tile-title">Real Estate</div>
+            <div class="tile-desc">Property development and investment schemes share profits with the interest holders from the business.</div>
+          </div>
+        </button>
+
+        <button class="tile" data-tile>
+          <div class="tile-top">
+            <span class="tile-symbol">Rs</span>
+            <span class="tile-toggle">+</span>
+          </div>
+          <div>
+            <div class="tile-title">Recreational Sports Clubs</div>
+            <div class="tile-desc">Sports club memberships give members the right to use club facilities, without owning a stake in the club.</div>
+          </div>
+        </button>
+
+        <button class="tile" data-tile>
+          <div class="tile-top">
+            <span class="tile-symbol">Ag</span>
+            <span class="tile-toggle">+</span>
+          </div>
+          <div>
+            <div class="tile-title">Agriculture</div>
+            <div class="tile-desc">Attracts capital by offering benefits to interest holders. Structure ranges from profit-sharing all the way to sharefarming.</div>
+          </div>
+        </button>
+
+        <button class="tile" data-tile>
+          <div class="tile-top">
+            <span class="tile-symbol">Hr</span>
+            <span class="tile-toggle">+</span>
+          </div>
+          <div>
+            <div class="tile-title">Hotels/Resorts</div>
+            <div class="tile-desc">A legitimate Interest Scheme structure allows operators to offer membership offerings that extend beyond 12 months.</div>
+          </div>
+        </button>
+
+        <button class="tile" data-tile>
+          <div class="tile-top">
+            <span class="tile-symbol">Sb</span>
+            <span class="tile-toggle">+</span>
+          </div>
+          <div>
+            <div class="tile-title">SME Business Expansion</div>
+            <div class="tile-desc">Any form of capital raising for scaling a business.</div>
+          </div>
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <!-- process -->
+  <section class="light" id="process">
+    <div class="wrap">
+      <div class="section-head">
+        <div class="eyebrow">ENGAGEMENT</div>
+        <h2>Four stages we help our clients go through</h2>
+        <p>This is the same regiment CATALYST runs for every client.</p>
+      </div>
+      <div class="process-list">
+        <div class="process-item">
+          <div class="process-num">01</div>
+          <div>
+            <h3>Case-building</h3>
+            <p>We identify what your business is raising for, and we structure the interest units around it. This stage involves us preparing documents that form the basis of your scheme, including prerequisites as stipulated under the Interest Schemes Act such as drafting the Trust Deed, Prospectus, conceptual write-ups, agreements, feasibility reports... the list goes on. We give our utmost to present an impervious case so that it's destined for approval. </p>
+          </div>
+        </div>
+        <div class="process-item">
+          <div class="process-num">02</div>
+          <div>
+            <h3>Submission</h3>
+            <p>After fulfilling all requirements, an application will then be formally lodged with the Companies Commission of Malaysia. It will be documented and presented the way the regulator expects to receive it.</p>
+          </div>
+        </div>
+        <div class="process-item">
+          <div class="process-num">03</div>
+          <div>
+            <h3>Regulatory liaison</h3>
+            <p>We follow up closely with your case by clearing any formal queries, and engaging with every party involved. We won't rest on it for as long as the Certificate of Authorization isn't issued.</p>
+          </div>
+        </div>
+        <div class="process-item">
+          <div class="process-num">04</div>
+          <div>
+            <h3>Beyond approval</h3>
+            <p>We will continue to advise on the operation and continuity of your scheme well past the approval milestone. We also provide services for drafting Supplemental Trust Deeds, as well as Prsopectus renewals, according to how the circumstances of your scheme evolve.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+
+
+</main>
+
+<!-- footer -->
+<footer>
+  <div class="wrap">
+    <div class="footer-grid">
+      <div>
+        <a href="#top" class="logo"><img src="images/logo.png" alt="CATALYST Consulting Company"></a>
+        <p style="color:var(--slate); font-size:14px; max-width:32ch; margin-top:16px; line-height:1.6;">Interest Scheme advisory based in Ipoh, Malaysia</p>
+      </div>
+      <div>
+        <h4>Resources</h4>
+        <ul>
+          <li><a href="https://drive.google.com/uc?export=download&id=1akPaeJACSqrIhpAm8Zbw6ccIRoA9sCZq">Interest Scheme Act 2016</a></li>
+          <li><a href="#">How to spot illegal schemes</a></li>
+          <li><a href="resources/article2.html">Is your business model regulated by the Interest Schemes Act?</a></li>
+          <li><a href="resources.html">See more...</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>Contact</h4>
+        <ul>
+          <li><a href="mailto:primary@catalystconsulting.one">primary@catalystconsulting.one</a></li>
+          <li><a href="tel:+60148844855">014 8844 855</a></li>
+          <li style="color:var(--slate);">27, Level 3, Jalan Tun Sambanthan, Ipoh, Perak</li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2026 CATALYST Consulting Company</span>
+      <span>This site is under ongoing development</span>
+    </div>
+  </div>
+</footer>
+
+<!-- dropdown tile behavior -->
+<script>
+  document.querySelectorAll('[data-tile]').forEach(function(tile){
+    tile.addEventListener('click', function(){
+      var wasActive = tile.classList.contains('active');
+      document.querySelectorAll('[data-tile]').forEach(function(t){ t.classList.remove('active'); });
+      if(!wasActive){ tile.classList.add('active'); }
+    });
+  });
+</script>
+
+</body>
+</html>
